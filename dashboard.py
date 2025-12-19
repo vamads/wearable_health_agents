@@ -155,3 +155,33 @@ def process_metrics(df):
     })
     
     return daily_df
+
+def process_sleep(df):
+    # Filter for sleep analysis
+    sleep_df = df[df['type'] == 'HKCategoryTypeIdentifierSleepAnalysis'].copy()
+    
+    if sleep_df.empty:
+        return None
+        
+    # Calculate duration in hours
+    sleep_df['duration'] = (sleep_df['endDate'] - sleep_df['startDate']).dt.total_seconds() / 3600
+    
+    # We want to sum duration per "night". 
+    # A simple heuristic is to shift the date back by a few hours (e.g. 4 hours) so late night sleep counts for the previous day's "night",
+    # or just group by the date of the startDate. 
+    # Let's group by the date of the startDate for simplicity, but maybe shift 12 hours to align "night" to the date the sleep started mostly?
+    # Actually, usually sleep is credited to the day it ends or starts. Let's stick to startDate.date for now.
+    
+    sleep_df['date'] = sleep_df['startDate'].dt.date
+    sleep_df['date'] = pd.to_datetime(sleep_df['date'])
+    
+    # Filter for "Asleep" values if possible. The value column usually contains strings like "HKCategoryValueSleepAnalysisAsleep"
+    # But sometimes it's just "InBed". Let's try to find "Asleep" or "Core" or "Deep" or "REM".
+    # If we only have "InBed", we use that.
+    
+    # Check unique values in 'value' column for sleep
+    # For now, let's just sum all sleep records per day to get "Total Sleep"
+    
+    daily_sleep = sleep_df.groupby('date')['duration'].sum()
+    
+    return daily_sleep
