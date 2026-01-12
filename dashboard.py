@@ -7,6 +7,24 @@ import numpy as np
 # Set page config
 st.set_page_config(page_title="Wearable Health Dashboard", layout="wide")
 
+# --- Custom CSS ---
+st.markdown("""
+<style>
+    /* Modernputs and buttons */
+    .stTextInput > div > div > input {
+        border-radius: 10px;
+    }
+    .stTextArea > div > div > textarea {
+        border-radius: 10px;
+    }
+    .stButton > button {
+        border-radius: 20px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # --- Data Loading ---
 @st.cache_data
 def load_data():
@@ -187,7 +205,7 @@ def process_sleep(df):
     return daily_sleep
 
 # --- Main App ---
-st.title("🏃‍♂️ Wearable Health Dashboard")
+st.title("Wearable Health Dashboard")
 
 raw_df = load_data()
 
